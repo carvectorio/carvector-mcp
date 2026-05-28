@@ -1,0 +1,48 @@
+{
+	"name": "carvector-mcp",
+	"mcpName": "io.github.carvectorio/carvector-mcp",
+	"version": "1.0.1",
+	"description": "MCP server that gives your AI agent real vehicle data — specs, representative images, federal recalls, and OBD-II DTC reference — from the CarVector API.",
+	"type": "module",
+	"bin": {
+		"carvector-mcp": "index.js"
+	},
+	"files": [
+		"index.js",
+		"README.md",
+		"LICENSE"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.29.0"
+	},
+	"keywords": [
+		"mcp",
+		"model-context-protocol",
+		"ai-agent",
+		"claude",
+		"cursor",
+		"vehicle",
+		"automotive",
+		"car-api",
+		"vehicle-data",
+		"recalls",
+		"obd2",
+		"dtc"
+	],
+	"homepage": "https://carvector.io",
+	"bugs": {
+		"url": "https://carvector.io/docs/mcp"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/carvectorio/carvector-mcp.git"
+	},
+	"author": "CarVector.io",
+	"license": "MIT"
+}

@@ -1,0 +1,29 @@
+{
+	"$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+	"name": "io.github.carvectorio/carvector-mcp",
+	"description": "Vehicle specs, federal recall data, and OBD-II DTC reference for AI agents via Model Context Protocol.",
+	"version": "1.0.1",
+	"repository": {
+		"url": "https://github.com/carvectorio/carvector-mcp",
+		"source": "github"
+	},
+	"websiteUrl": "https://carvector.io",
+	"packages": [
+		{
+			"registryType": "npm",
+			"identifier": "carvector-mcp",
+			"version": "1.0.1",
+			"transport": {
+				"type": "stdio"
+			},
+			"environmentVariables": [
+				{
+					"name": "CARVECTOR_API_KEY",
+					"description": "Your CarVector API key (free at carvector.io)",
+					"isRequired": true,
+					"isSecret": true
+				}
+			]
+		}
+	]
+}
