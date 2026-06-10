@@ -1,0 +1,28 @@
+name: Publish to npm
+
+# Publishes carvector-mcp to npm whenever a GitHub Release is published.
+# Uses npm "trusted publishing" (OIDC) — no NPM_TOKEN secret, no 2FA prompt.
+# One-time setup on npmjs.com: the package's Settings → Trusted Publisher →
+# GitHub Actions → org/repo = carvectorio/carvector-mcp, workflow = publish.yml.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write   # required: lets npm verify this workflow via OIDC + add provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing requires npm >= 11.5.1 (newer than the bundled npm).
+      - run: npm install -g npm@latest
+      - run: npm publish --provenance --access public
