@@ -1,8 +1,8 @@
 {
 	"name": "carvector-mcp",
 	"mcpName": "io.github.carvectorio/carvector-mcp",
-	"version": "1.0.1",
-	"description": "MCP server that gives your AI agent real vehicle data — specs, representative images, federal recalls, and OBD-II DTC reference — from the CarVector API.",
+	"version": "1.1.0",
+	"description": "MCP server that gives your AI agent real vehicle data — specs, representative images, federal recalls, owner complaints, service bulletins, defect investigations, and OBD-II DTC reference — from the CarVector API.",
 	"type": "module",
 	"bin": {
 		"carvector-mcp": "index.js"
@@ -32,6 +32,10 @@
 		"car-api",
 		"vehicle-data",
 		"recalls",
+		"complaints",
+		"tsb",
+		"service-bulletins",
+		"investigations",
 		"obd2",
 		"dtc"
 	],

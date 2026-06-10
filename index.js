@@ -12,7 +12,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 const BASE = process.env.CARVECTOR_BASE_URL || 'https://api.carvector.io';
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 
 const ARGV = process.argv.slice(2);
 if (ARGV.includes('--version') || ARGV.includes('-v')) {
@@ -29,7 +29,7 @@ if (ARGV.includes('--help') || ARGV.includes('-h')) {
 			`  --key <cv_…>   API key (prefer the CARVECTOR_API_KEY env var)\n` +
 			`  --version, -v  print version\n` +
 			`  --help, -h     show this help\n\n` +
-			`Tools: search_vehicles, get_vehicle, get_recalls, lookup_dtc\n` +
+			`Tools: search_vehicles, get_vehicle, get_recalls, get_complaints, get_tsbs, get_investigations, lookup_dtc\n` +
 			`Free key + docs: https://carvector.io\n`
 	);
 	process.exit(0);
@@ -61,6 +61,15 @@ async function api(path) {
 		body = null;
 	}
 	return { status: res.status, body };
+}
+
+// Optional limit/since query string for the per-vehicle failure endpoints.
+function listQuery(a) {
+	const q = new URLSearchParams();
+	if (a.limit != null) q.set('limit', String(a.limit));
+	if (a.since) q.set('since', String(a.since));
+	const s = q.toString();
+	return s ? `?${s}` : '';
 }
 
 const TOOLS = [
@@ -118,6 +127,51 @@ const TOOLS = [
 			required: ['code']
 		},
 		call: (a) => api(`/dtc/${encodeURIComponent(String(a.code ?? ''))}`)
+	},
+	{
+		name: 'get_complaints',
+		description:
+			'Get the owner-complaint signal for a vehicle by its id: an aggregate (totals by component and year, plus crash/fire/injury counts) and the most-recent complaints. Requires a Pro plan or higher.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				id: { type: 'string', description: 'Vehicle id from search_vehicles.' },
+				limit: { type: 'integer', description: 'Most-recent complaints to return, 1–10 (default 10).' },
+				since: { type: 'string', description: 'Only complaints on/after this ISO date, YYYY-MM-DD.' }
+			},
+			required: ['id']
+		},
+		call: (a) => api(`/vehicles/${encodeURIComponent(String(a.id ?? ''))}/complaints${listQuery(a)}`)
+	},
+	{
+		name: 'get_tsbs',
+		description:
+			'Get the manufacturer technical service bulletin (TSB) index for a vehicle by its id — bulletin metadata (id, date, type, affected components, summary), not the documents themselves. Requires a Business plan or higher.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				id: { type: 'string', description: 'Vehicle id from search_vehicles.' },
+				limit: { type: 'integer', description: 'Bulletins to return, 1–50 (default 50).' },
+				since: { type: 'string', description: 'Only bulletins on/after this ISO date, YYYY-MM-DD.' }
+			},
+			required: ['id']
+		},
+		call: (a) => api(`/vehicles/${encodeURIComponent(String(a.id ?? ''))}/tsbs${listQuery(a)}`)
+	},
+	{
+		name: 'get_investigations',
+		description:
+			'Get federal defect investigations for a vehicle by its id — a leading indicator that often precedes recalls. Returns each action with subject, component, open/close dates, and status. Requires a Business plan or higher.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				id: { type: 'string', description: 'Vehicle id from search_vehicles.' },
+				limit: { type: 'integer', description: 'Investigations to return, 1–100 (default 100).' },
+				since: { type: 'string', description: 'Only investigations opened on/after this ISO date, YYYY-MM-DD.' }
+			},
+			required: ['id']
+		},
+		call: (a) => api(`/vehicles/${encodeURIComponent(String(a.id ?? ''))}/investigations${listQuery(a)}`)
 	}
 ];
 
@@ -128,7 +182,7 @@ const server = new Server(
 	{
 		capabilities: { tools: {} },
 		instructions:
-			'CarVector exposes real, multi-source-verified vehicle data: specs, representative images, federal recalls, and DTC reference. To answer questions about a specific vehicle, first call search_vehicles to resolve its id, then get_vehicle or get_recalls. Do not invent vehicle data — use these tools.'
+			'CarVector exposes real, multi-source-verified vehicle data: specs, representative images, federal recalls, owner complaints, manufacturer service bulletins (TSBs), defect investigations, and OBD-II DTC reference. To answer questions about a specific vehicle, first call search_vehicles to resolve its id, then get_vehicle, get_recalls, get_complaints, get_tsbs, or get_investigations. Do not invent vehicle data — use these tools.'
 	}
 );
 
@@ -143,6 +197,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 		const { status, body } = await tool.call(req.params.arguments ?? {});
 		if (status === 401) return err('Invalid or missing CarVector API key. Get a free key at https://carvector.io.');
 		if (status === 429) return err('Rate limit reached for your plan. Try again later, or upgrade at https://carvector.io/pricing.');
+		if (status === 403) return err(body?.message || 'This tool requires a higher plan. Upgrade at https://carvector.io/pricing.');
 		if (status === 404 || body == null) return err('Not found — no matching vehicle or code.');
 		if (status >= 400) return err(`CarVector API error (${status}): ${JSON.stringify(body)}`);
 		return { content: [{ type: 'text', text: JSON.stringify(body, null, 2) }] };
@@ -153,4 +208,4 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-process.stderr.write('carvector-mcp connected — 4 tools ready (search_vehicles, get_vehicle, get_recalls, lookup_dtc)\n');
+process.stderr.write('carvector-mcp connected — 7 tools ready (search_vehicles, get_vehicle, get_recalls, get_complaints, get_tsbs, get_investigations, lookup_dtc)\n');
