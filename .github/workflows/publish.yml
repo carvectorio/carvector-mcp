@@ -22,7 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
       # Trusted publishing requires npm >= 11.5.1 (newer than the bundled npm).
+      # NOTE: deliberately no registry-url — it writes an empty-token .npmrc that
+      # can short-circuit OIDC auth and cause a 404 on publish.
       - run: npm install -g npm@latest
+      - run: node --version && npm --version
       - run: npm publish --provenance --access public
