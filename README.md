@@ -79,7 +79,7 @@ Your agent answers: *"Yes — P0300 is a high-severity, safety-related misfire c
 
 ## Three things to build with it
 
-- **A service-advisor copilot** that pulls a customer's exact trim, open recalls, and a decoded check-engine code — in one turn, no tab-switching.
+- **A service-advisor copilot** that pulls a customer's exact trim, open recalls, the manufacturer's documented fix (TSBs), the complaint pattern behind a symptom, and a decoded check-engine code — in one turn, no tab-switching.
 - **A consumer car chatbot** that answers "what engine does my truck have" and "is it under recall" with real data instead of a hallucination.
 - **A coding/automotive agent** that needs structured vehicle knowledge as a tool, not a wall of scraped text to parse.
 
@@ -91,6 +91,9 @@ Your agent answers: *"Yes — P0300 is a high-severity, safety-related misfire c
 
 - **Vehicles** — a broad catalog (1925–2029), broken out by trim and engine variant, with representative illustrations (not photos).
 - **Recalls** — federal recall campaigns mapped to year / make / model.
+- **Complaints** — owner-filed complaints aggregated by component (with crash / fire / injury counts) plus the most recent filings, mapped to a vehicle. *(Pro plan.)*
+- **Service bulletins (TSBs)** — the manufacturer's technical service-bulletin index — metadata, not the documents. *(Business plan.)*
+- **Investigations** — federal defect investigations, a leading indicator that often precedes a recall. *(Business plan.)*
 - **DTC reference** — OBD-II codes classified by category, severity, and safety/emissions flags. *Reference only — repair-cost economics is on the roadmap, not in responses today.*
 
 Calls count against your plan's rate limit and show up in your [dashboard](https://carvector.io/dashboard), exactly like a REST request.
