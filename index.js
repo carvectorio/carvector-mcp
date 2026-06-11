@@ -12,7 +12,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 const BASE = process.env.CARVECTOR_BASE_URL || 'https://api.carvector.io';
-const VERSION = '1.1.0';
+const VERSION = '1.1.1';
 
 const ARGV = process.argv.slice(2);
 if (ARGV.includes('--version') || ARGV.includes('-v')) {
